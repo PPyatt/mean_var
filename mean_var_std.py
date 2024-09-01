@@ -13,41 +13,46 @@
 
 
 import numpy as np
+from xlwings.constants import calculations
+
 
 def calculate(list):
-    a = np.array(list)
-    a = np.reshape(a, (3,3))
-    print(a)
-    # Mean
-    mean1 = np.mean(a, axis=0)
-    mean2 = np.mean(a, axis=1)
-    meanF = np.mean(a, axis=None)
-    output = { 'mean':[mean1, mean2, meanF]}
-    # Variance
-    var1 = np.var(a, axis=0)
-    var2 = np.var(a, axis=1)
-    varF = np.var(a, axis=None)
-    output['variance']= [var1, var2, varF]
-    # Standard Deviation
-    std1 = np.std(a, axis=0)
-    std2 = np.std(a, axis=1)
-    stdF = np.std(a, axis=None)
-    output['standard deviation'] = [std1, std2, stdF]
-    # Max
-    max1 = np.max(a, axis=0)
-    max2 = np.max(a, axis=1)
-    maxF = np.max(a, axis=None)
-    output['max'] = [max1, max2, maxF]
-    # Min
-    min1 = np.min(a, axis=0)
-    min2 = np.min(a, axis=1)
-    minF = np.min(a, axis=None)
-    output['min'] = [min1, min2, minF]
-    sum1 = np.sum(a, axis=0)
-    sum2 = np.sum(a, axis=1)
-    sumF = np.sum(a, axis=None)
-    output['sum'] = [sum1, sum2, sumF]
+    if len(list) != 9:
+         raise ValueError("List must contain nine numbers.")
+    else:
+        a = np.array(list)
+        a = np.reshape(a, (3,3))
 
-    calculations = output
+        # Mean
+        mean1 = np.mean(a, axis=0, dtype=float).tolist()
+        mean2 = np.mean(a, axis=1, dtype=float).tolist()
+        meanF = np.mean(a, axis=None, dtype=float).tolist()
+        output = { 'mean':[mean1, mean2, meanF]}
+        # Variance
+        var1 = np.var(a, axis=0).tolist()
+        var2 = np.var(a, axis=1).tolist()
+        varF = np.var(a, axis=None).tolist()
+        output['variance']= [var1, var2, varF]
+        # Standard Deviation
+        std1 = np.std(a, axis=0).tolist()
+        std2 = np.std(a, axis=1).tolist()
+        stdF = np.std(a, axis=None).tolist()
+        output['standard deviation'] = [std1, std2, stdF]
+        # Max
+        max1 = np.max(a, axis=0).tolist()
+        max2 = np.max(a, axis=1).tolist()
+        maxF = np.max(a, axis=None).tolist()
+        output['max'] = [max1, max2, maxF]
+        # Min
+        min1 = np.min(a, axis=0).tolist()
+        min2 = np.min(a, axis=1).tolist()
+        minF = np.min(a, axis=None).tolist()
+        output['min'] = [min1, min2, minF]
+        sum1 = np.sum(a, axis=0).tolist()
+        sum2 = np.sum(a, axis=1).tolist()
+        sumF = np.sum(a, axis=None).tolist()
+        output['sum'] = [sum1, sum2, sumF]
 
-    return calculations
+        calculations = output
+
+        return calculations
