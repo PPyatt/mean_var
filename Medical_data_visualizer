@@ -1,0 +1,59 @@
+import pandas as pd
+import seaborn as sns
+import matplotlib.pyplot as plt
+import numpy as np
+from intake.util_tests import temp_conf
+from sqlalchemy.dialects.mssql.information_schema import columns
+from sympy.physics.control.control_plots import matplotlib
+from xarray.core.indexing import as_indexable
+
+fileN ='medical_examination.csv'
+df = pd.read_csv(fileN)
+
+# W (kg) / H**2 (m) --> if >25 overwheight = yes or 1
+overweight = pd.Series(df['weight']/((df['height']/100)**2))
+def funcX(x):
+    return 1 if x > 25 else 0
+df['overweight'] = overweight.apply( funcX )
+#The example plot has gender instead of sex, but the tester requires sex.
+#df.rename(columns={'sex':'gender'},inplace=True)
+
+def funcY(y):
+    return 0 if y == 1 else 1
+df['cholesterol'] = df['cholesterol'].apply( funcY )
+df['gluc'] = df['gluc'].apply( funcY )
+
+def draw_cat_plot():
+    df_cat = pd.melt(df, id_vars=["cardio"], value_vars=['cholesterol', 'gluc', 'smoke', 'alco', 'active', 'overweight'])
+
+    figure = sns.catplot( x="variable", kind = 'count', hue = 'value', data=df_cat, col='cardio')
+    figure.set_axis_labels('variable','total')
+    fig = figure
+
+    fig.savefig('catplot.png')
+    return fig
+
+def draw_heat_map():
+    df_heat= df[
+        (df['ap_lo'] <= df["ap_hi"]) &
+        (df["height"] >= df["height"].quantile(0.025))&
+        (df["height"] <= df["height"].quantile(0.975))&
+        (df["weight"] >= df["weight"].quantile(0.025))&
+        (df["weight"] <= df["weight"].quantile(0.975))
+    ]
+# Calculate the correlation matrix
+    corr = df_heat.corr()
+# Generate a mask for the upper triangle
+    mask = np.triu(np.ones_like(corr, dtype=bool))
+
+# Set up the matplotlib figure
+    fig, ax = plt.subplots(figsize= (12,12))
+# Draw the heatmap with 'sns.heatmap()'
+    sns.heatmap(corr, vmin=0, vmax= 0.25, fmt='.1f', linewidth=1, annot=True, square=True, mask=mask, cbar_kws={'shrink': .50})
+
+    fig.savefig('heatmap.png')
+    return fig
+
+
+draw_cat_plot()
+draw_heat_map()
